@@ -1,6 +1,3 @@
-import sys
-import os
-import difflib
 import numpy
 
 array = numpy.zeros((1000, 1000), dtype=object)
