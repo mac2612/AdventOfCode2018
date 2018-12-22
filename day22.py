@@ -1,4 +1,5 @@
 import numpy
+import pdb
 
 depth = 3339
 target = (10, 715)
@@ -18,8 +19,9 @@ def reconstruct_path(cameFrom, current):
     total_path.append(current)
   return total_path
 
-def get_types(node, cave):
-  return [(node[0], node[1], r) for r in TOOL_TYPES[cave[node[0]][node[1]][3]]]
+def get_types(src, dest,  cave):
+  types = set(TOOL_TYPES[cave[src[0]][src[1]][3]]).intersection(set(TOOL_TYPES[cave[dest[0]][dest[1]][3]]))
+  return [(dest[0], dest[1], r) for r in types]
 
 
 def get_neighbors(node, cave):
@@ -28,9 +30,9 @@ def get_neighbors(node, cave):
           (node[0],   node[1]+1),
           (node[0],   node[1]-1)]
   ret = []
-  for n in potential_neighbors:
-    if (n[0] >= 0 and n[1] >= 0 and n[0] < len(cave) and n[1] < len(cave[0])):
-      ret.extend(get_types(n, cave))
+  for d in potential_neighbors:
+    if (d[0] >= 0 and d[1] >= 0 and d[0] < len(cave) and d[1] < len(cave[0])):
+      ret.extend(get_types(node, d, cave))
   return ret
 
 def a_star(start, goal, board, debug = False):
@@ -68,11 +70,8 @@ def a_star(start, goal, board, debug = False):
       fScore[neighbor] = gScore[neighbor] + heuristic_cost_estimate(neighbor, goal)
 
 def get_cost_estimate(start, goal):
-  # Can't change to a tool that we're not allowed to equip in the current space.
-  if goal[2] not in TOOL_TYPES[cave[start[0]][start[1]][3]]:
-    return 999999
   # Changing a tool is 7 minutes changing + 1 minute moving
-  elif start[2] != goal[2]:
+  if start[2] != goal[2]:
     return 8
   else:
     return 1
